@@ -108,6 +108,7 @@ namespace Opm {
         const TableContainer& getPmiscTables() const;
         const TableContainer& getMsfnTables() const;
         const TableContainer& getTlpmixpaTables() const;
+        const TableContainer& getAquanconTables() const;
 
         const JFunc& getJFunc() const;
 
@@ -304,6 +305,7 @@ namespace Opm {
         std::shared_ptr<Regdims> m_regdims;
         std::shared_ptr<Eqldims> m_eqldims;
         Aqudims m_aqudims;
+
 
         const bool hasImptvd;// if deck has keyword IMPTVD
         const bool hasEnptvd;// if deck has keyword ENPTVD

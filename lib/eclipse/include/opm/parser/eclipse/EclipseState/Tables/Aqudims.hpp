@@ -1,9 +1,5 @@
 /*
-<<<<<<< febf2f9898ce6564a56c082b691433a3d516fc43
   Copyright (C) 2017 TNO
-=======
-  Copyright (C) 2015 Statoil ASA
->>>>>>> Parser support for Aquifer tables
 
   This file is part of the Open Porous Media project (OPM).
 
@@ -33,6 +29,7 @@
 #include <opm/parser/eclipse/Deck/Deck.hpp>
 #include <opm/parser/eclipse/Deck/DeckRecord.hpp>
 #include <opm/parser/eclipse/Deck/DeckKeyword.hpp>
+
 
 namespace Opm {
     class Aqudims {
