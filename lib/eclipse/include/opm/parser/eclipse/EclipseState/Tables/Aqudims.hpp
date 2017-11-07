@@ -30,7 +30,6 @@
 #include <opm/parser/eclipse/Deck/DeckRecord.hpp>
 #include <opm/parser/eclipse/Deck/DeckKeyword.hpp>
 
-
 namespace Opm {
     class Aqudims {
     public:
