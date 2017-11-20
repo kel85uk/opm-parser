@@ -297,8 +297,12 @@ namespace Opm {
 
         initSimpleTableContainer<RsvdTable>(deck, "RSVD" , m_eqldims->getNumEquilRegions());
         initSimpleTableContainer<RvvdTable>(deck, "RVVD" , m_eqldims->getNumEquilRegions());
+<<<<<<< 28c7a9f62bd1db084661fecf648c7ff2c42eb08f
         initSimpleTableContainer<AqutabTable>(deck, "AQUTAB" , m_aqudims.getNumInfluenceTablesCT());
 
+=======
+        initSimpleTableContainer<AqutabTable>(deck, "AQUTAB" , m_aqudims->getNumInfluenceTablesCT());
+>>>>>>> removed aquancon implementation as a table
         {
             size_t numEndScaleTables = ParserKeywords::ENDSCALE::NUM_TABLES::defaultValue;
 
