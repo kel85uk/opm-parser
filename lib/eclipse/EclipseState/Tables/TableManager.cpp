@@ -152,7 +152,7 @@ namespace Opm {
             m_regdims = std::make_shared<Regdims>( ntfip , nmfipr , nrfreg , ntfreg , nplmix );
         } else
             m_regdims = std::make_shared<Regdims>();
-
+/*
         if (deck.hasKeyword<AQUDIMS>()) {
             const auto& keyword = deck.getKeyword<AQUDIMS>();
             const auto& record = keyword.getRecord(0);
@@ -164,9 +164,10 @@ namespace Opm {
             int ncamax = record.getItem<AQUDIMS::NCAMAX>().get< int >(0);
             int mxnali = record.getItem<AQUDIMS::MXNALI>().get< int >(0);
             int mxaaql = record.getItem<AQUDIMS::MXAAQL>().get< int >(0);    
-            m_aqudims = std::make_shared<Aqudims>( mxnaqn , mxnaqc , niftbl , nriftb , nanaqu, ncamax, mxnali, mxaaql );
+            m_aqudims = Aqudims( mxnaqn , mxnaqc , niftbl , nriftb , nanaqu, ncamax, mxnali, mxaaql );
         } else
-            m_aqudims = std::make_shared<Aqudims>();
+            m_aqudims = Aqudims();
+	*/
     }
 
 
@@ -297,12 +298,6 @@ namespace Opm {
 
         initSimpleTableContainer<RsvdTable>(deck, "RSVD" , m_eqldims->getNumEquilRegions());
         initSimpleTableContainer<RvvdTable>(deck, "RVVD" , m_eqldims->getNumEquilRegions());
-<<<<<<< 28c7a9f62bd1db084661fecf648c7ff2c42eb08f
-        initSimpleTableContainer<AqutabTable>(deck, "AQUTAB" , m_aqudims.getNumInfluenceTablesCT());
-
-=======
-        initSimpleTableContainer<AqutabTable>(deck, "AQUTAB" , m_aqudims->getNumInfluenceTablesCT());
->>>>>>> removed aquancon implementation as a table
         {
             size_t numEndScaleTables = ParserKeywords::ENDSCALE::NUM_TABLES::defaultValue;
 

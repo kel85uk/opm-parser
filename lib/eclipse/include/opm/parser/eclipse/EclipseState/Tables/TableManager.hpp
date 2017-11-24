@@ -305,7 +305,6 @@ namespace Opm {
         std::shared_ptr<Eqldims> m_eqldims;
         Aqudims m_aqudims;
 
-
         const bool hasImptvd;// if deck has keyword IMPTVD
         const bool hasEnptvd;// if deck has keyword ENPTVD
         const bool hasEqlnum;// if deck has keyword EQLNUM
