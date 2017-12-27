@@ -77,8 +77,8 @@ namespace Opm {
 
             AquiferCT(const EclipseState& eclState, const Deck& deck);
 
-            std::vector<AquiferCT::AQUCT_data> getAquifers();
-            std::vector<AquiferCT::AQUANCON_data> getAquancon();
+            const std::vector<AquiferCT::AQUCT_data>& getAquifers() const;
+            const std::vector<AquiferCT::AQUANCON_data>& getAquancon() const;
      
             const int getAqInflTabID(size_t aquiferIndex);
             const int getAqPvtTabID(size_t aquiferIndex);
@@ -91,7 +91,6 @@ namespace Opm {
 
             // Initialize function
             inline std::vector<AquiferCT::AQUCT_data>
-
             init_aquct_aqutab(const EclipseState& eclState, const Deck& deck)
             {
                 if (!deck.hasKeyword("AQUCT")){
@@ -139,7 +138,6 @@ namespace Opm {
             }
 
             inline std::vector<AquiferCT::AQUANCON_data>
-
             init_aquancon(const EclipseState& eclState, const Deck& deck)
             {
                 if (!deck.hasKeyword("AQUANCON")){

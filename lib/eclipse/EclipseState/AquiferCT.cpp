@@ -27,12 +27,12 @@ namespace Opm {
         m_aquancon = init_aquancon(eclState, deck);
     }
 
-    std::vector<AquiferCT::AQUCT_data> AquiferCT::getAquifers()
+    const std::vector<AquiferCT::AQUCT_data>& AquiferCT::getAquifers() const
     {
         return m_aquifers;
     }
 
-    std::vector<AquiferCT::AQUANCON_data> AquiferCT::getAquancon()
+    const std::vector<AquiferCT::AQUANCON_data>& AquiferCT::getAquancon() const
     {
         return m_aquancon;
     }
