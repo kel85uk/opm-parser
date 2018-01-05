@@ -226,6 +226,7 @@ namespace Opm {
         addTables( "RVVD", m_eqldims->getNumEquilRegions());
         addTables( "AQUTAB", m_aqudims.getNumInfluenceTablesCT());
 
+        addTables( "AQUTAB", m_aqudims.getNumInfluenceTablesCT());
         {
             size_t numMiscibleTables = ParserKeywords::MISCIBLE::NTMISC::defaultValue;
             if (deck.hasKeyword<ParserKeywords::MISCIBLE>()) {
@@ -282,6 +283,7 @@ namespace Opm {
 
         initSimpleTableContainer<RsvdTable>(deck, "RSVD" , m_eqldims->getNumEquilRegions());
         initSimpleTableContainer<RvvdTable>(deck, "RVVD" , m_eqldims->getNumEquilRegions());
+        initSimpleTableContainer<AqutabTable>(deck, "AQUTAB" , m_aqudims.getNumInfluenceTablesCT());
         {
             size_t numEndScaleTables = ParserKeywords::ENDSCALE::NUM_TABLES::defaultValue;
 
