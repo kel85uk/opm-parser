@@ -32,7 +32,6 @@
 #include <opm/parser/eclipse/Deck/DeckItem.hpp>
 #include <opm/parser/eclipse/Deck/DeckRecord.hpp>
 #include <opm/parser/eclipse/Deck/DeckKeyword.hpp>
-
 #include <opm/parser/eclipse/EclipseState/Tables/Aqudims.hpp>
 #include <opm/parser/eclipse/EclipseState/Tables/TableContainer.hpp>
 #include <opm/parser/eclipse/EclipseState/Tables/AqutabTable.hpp>
@@ -60,7 +59,6 @@ namespace Opm {
                             h , //aquifer thickness
                             theta , //angle subtended by the aquifer boundary
                             c2 ; //6.283 (METRIC, PVT-M); 1.1191 (FIELD); 6.283 (LAB).
-                    
                     std::vector<double> td, pi;
             };
 
@@ -71,102 +69,25 @@ namespace Opm {
                     // Grid cell box definition to connect aquifer
                     int i1, i2, j1, j2, k1, k2;
                     // Variables constants
-                    double  influx_coeff, //Aquifer influx coefficient
-                            influx_mult;   //Aquifer influx coefficient Multiplier
+                    double  influx_coeff,  //Aquifer influx coefficient
+                            influx_mult;   //Aquifer influx coefficient Multiplier       
+                    // Cell face to connect aquifer to        
+                    std::string face;           
             };
 
             AquiferCT(const EclipseState& eclState, const Deck& deck);
 
             const std::vector<AquiferCT::AQUCT_data>& getAquifers() const;
             const std::vector<AquiferCT::AQUANCON_data>& getAquancon() const;
-     
             const int getAqInflTabID(size_t aquiferIndex);
             const int getAqPvtTabID(size_t aquiferIndex);
             const double getAqInfluxCoeff(size_t aquanconRecord);
             const double getAqInfluxMult(size_t aquanconRecord);
-        private:
-        
-            std::vector<AquiferCT::AQUCT_data> m_aquifers;
+
+            std::vector<AquiferCT::AQUCT_data> m_aquct;
             std::vector<AquiferCT::AQUANCON_data> m_aquancon;
-
-            // Initialize function
-            inline std::vector<AquiferCT::AQUCT_data>
-            init_aquct_aqutab(const EclipseState& eclState, const Deck& deck)
-            {
-                if (!deck.hasKeyword("AQUCT")){
-                    std::cout<<("The Carter-Tracy aquifer parameters must be specified in the deck through the AQUCT keyword")<<std::endl;
-                }
-                const auto& aquctKeyword = deck.getKeyword("AQUCT");
-
-                std::vector<AquiferCT::AQUCT_data> aquctParams;
-                // Resize the parameter vector container based on row entries in aquct
-                // We do the same for aquifers too because number of aquifers is assumed to be for each entry in aquct
-                aquctParams.resize(aquctKeyword.size());
-                for (size_t aquctRecordIdx = 0; aquctRecordIdx < aquctKeyword.size(); ++ aquctRecordIdx) 
-                {
-                    const auto& aquctRecord = aquctKeyword.getRecord(aquctRecordIdx);
-
-                    aquctParams.at(aquctRecordIdx).aquiferID = aquctRecord.getItem("AQUIFER_ID").template get<int>(0);
-                    aquctParams.at(aquctRecordIdx).h = aquctRecord.getItem("THICKNESS_AQ").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).phi_aq = aquctRecord.getItem("PORO_AQ").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).d0 = aquctRecord.getItem("DAT_DEPTH").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).C_t = aquctRecord.getItem("C_T").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).r_o = aquctRecord.getItem("RAD").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).k_a = aquctRecord.getItem("PERM_AQ").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).theta = aquctRecord.getItem("INFLUENCE_ANGLE").getSIDouble(0);
-                    aquctParams.at(aquctRecordIdx).c1 = 0.008527; // We are using SI
-                    aquctParams.at(aquctRecordIdx).c2 = 6.283;
-                    aquctParams.at(aquctRecordIdx).inftableID = aquctRecord.getItem("TABLE_NUM_INFLUENCE_FN").template get<int>(0);
-                    aquctParams.at(aquctRecordIdx).pvttableID = aquctRecord.getItem("TABLE_NUM_WATER_PRESS").template get<int>(0);
-
-                    // Get the correct influence table values
-                    if (aquctParams.at(aquctRecordIdx).inftableID > 1)
-                    {
-                        const auto& aqutabTable = eclState.getTableManager().getAqutabTables().getTable(aquctParams.at(aquctRecordIdx).inftableID - 1);
-                        const auto& aqutab_tdColumn = aqutabTable.getColumn(0);
-                        const auto& aqutab_piColumn = aqutabTable.getColumn(1);
-                        aquctParams.at(aquctRecordIdx).td = aqutab_tdColumn.vectorCopy();
-                        aquctParams.at(aquctRecordIdx).pi = aqutab_piColumn.vectorCopy();
-                    }
-                    else
-                    {
-                        set_default_tables(aquctParams.at(aquctRecordIdx).td,aquctParams.at(aquctRecordIdx).pi);
-                    }
-                }
-
-                return aquctParams;
-            }
-
-            inline std::vector<AquiferCT::AQUANCON_data>
-            init_aquancon(const EclipseState& eclState, const Deck& deck)
-            {
-                if (!deck.hasKeyword("AQUANCON")){
-                    std::cout<<("The Carter-Tracy aquifer connections must be specified in the deck with the AQUANCON keyword")<<std::endl;
-                }
-
-                const auto& aquanconKeyword = deck.getKeyword("AQUANCON");
-
-                std::vector<AquiferCT::AQUANCON_data> aquanconParams;
-                // Resize the parameter vector container based on row entries in aquancon
-                aquanconParams.resize(aquanconKeyword.size());
-                //For now assuming AQUANCON keyword defines connection only for one aquifer
-                for (size_t aquanconRecordIdx = 0; aquanconRecordIdx < aquanconKeyword.size(); ++ aquanconRecordIdx) 
-                {
-                    const auto& aquanconRecord = aquanconKeyword.getRecord(aquanconRecordIdx);
-
-                    aquanconParams.at(aquanconRecordIdx).aquiferID = aquanconRecord.getItem("AQUIFER_ID").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).i1 = aquanconRecord.getItem("I1").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).i2 = aquanconRecord.getItem("I2").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).j1 = aquanconRecord.getItem("J1").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).j2 = aquanconRecord.getItem("J2").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).k1 = aquanconRecord.getItem("K1").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).k2 = aquanconRecord.getItem("K2").template get<int>(0);
-                    aquanconParams.at(aquanconRecordIdx).influx_coeff = aquanconRecord.getItem("INFLUX_COEFF").getSIDouble(0);
-                    aquanconParams.at(aquanconRecordIdx).influx_mult = aquanconRecord.getItem("INFLUX_MULT").getSIDouble(0);
-                }
-
-                return aquanconParams;
-            }
+    
+        private:
 
             inline void set_default_tables(std::vector<double>& td, std::vector<double>& pi)
             {
