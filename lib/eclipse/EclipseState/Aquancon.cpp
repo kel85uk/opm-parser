@@ -85,15 +85,25 @@ namespace Opm {
     void Aquancon::collate_function(std::vector<Aquancon::AquanconOutput>& output_vector)
     {
         output_vector.resize(m_maxAquID);
+        for (auto it = m_aquiferID_per_record.begin(); it != m_aquiferID_per_record.end(); ++it)
+                std::cout << *it << std::endl;
         // Find record indices at which the aquifer ids are located in
         for (int i = 1; i <= m_maxAquID; ++i)
         {
-            std::vector<int> result_id (m_aquiferID_per_record.size());
-            // We only copy those equal to the aquifer id
-            auto it = std::copy_if ( m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(),
-                                        result_id.begin(), [&i](int id){ return id == i; } );
+            std::vector<int> result_id;
+
+            auto it = std::find_if(m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(), [&](int id){return id == i;});
+            while (it != m_aquiferID_per_record.end()) {
+                result_id.emplace_back(std::distance(m_aquiferID_per_record.begin(), it));
+                it = std::find_if(std::next(it), m_aquiferID_per_record.end(), [&](int id){return id == i;});
+            }
+            
             // Resize the result container
-            result_id.resize( std::distance(result_id.begin(), it) );
+            // result_id.resize( std::distance(result_id.begin(), it) );
+
+            std::cout << "Aquifer ID = " << i << ": Result_id = " << std::endl;
+            for (auto it = result_id.begin(); it != result_id.end(); ++it)
+                std::cout << *it << std::endl;
 
             // We add the aquifer id into each element of output_vector
             output_vector.at(i - 1).aquiferID = i;
@@ -101,8 +111,8 @@ namespace Opm {
             {
                 output_vector.at(i - 1).global_index.insert(
                                                             output_vector.at(i - 1).global_index.end(),
-                                                            m_aqurecord.at(record_index_matching_id - 1).global_index_per_record.begin(),
-                                                            m_aqurecord.at(record_index_matching_id - 1).global_index_per_record.end()
+                                                            m_aqurecord.at(record_index_matching_id).global_index_per_record.begin(),
+                                                            m_aqurecord.at(record_index_matching_id).global_index_per_record.end()
                                                           );
             }
         }
