@@ -17,7 +17,9 @@
   along with OPM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <opm/parser/eclipse/EclipseState/AquiferCT.hpp>
+#include <opm/parser/eclipse/EclipseState/Aquancon.hpp>
+#include <algorithm>
+#include <iterator>
 
 namespace Opm {
 
@@ -26,27 +28,31 @@ namespace Opm {
         if (!deck.hasKeyword("AQUANCON"))
         {
             std::cout<<("The analytical aquifer connections must be specified in the deck with the AQUANCON keyword")<<std::endl;
+            // return an empty m_aquoutput vector
         }
 
         const auto& aquanconKeyword = deck.getKeyword("AQUANCON");
         // Resize the parameter vector container based on row entries in aquancon
         m_aqurecord.resize(aquanconKeyword.size());
+        m_aquiferID_per_record.resize(aquanconKeyword.size());
 
         // We now do a loop over each record entry in aquancon
+
         for (size_t aquanconRecordIdx = 0; aquanconRecordIdx < aquanconKeyword.size(); ++ aquanconRecordIdx) 
         {
-
             const auto& aquanconRecord = aquanconKeyword.getRecord(aquanconRecordIdx);
+            m_aquiferID_per_record.at(aquanconRecordIdx) = aquanconRecord.getItem("AQUIFER_ID").template get<int>(0);
 
             m_aqurecord.at(aquanconRecordIdx).i1 = aquanconRecord.getItem("I1").template get<int>(0);
             m_aqurecord.at(aquanconRecordIdx).i2 = aquanconRecord.getItem("I2").template get<int>(0);
             m_aqurecord.at(aquanconRecordIdx).j1 = aquanconRecord.getItem("J1").template get<int>(0);
             m_aqurecord.at(aquanconRecordIdx).j2 = aquanconRecord.getItem("J2").template get<int>(0);
             m_aqurecord.at(aquanconRecordIdx).k1 = aquanconRecord.getItem("K1").template get<int>(0);
-            
+            m_aqurecord.at(aquanconRecordIdx).k2 = aquanconRecord.getItem("K2").template get<int>(0);
 
-            m_aqurecord.at(aquanconRecordIdx).aquiferID_per_record = 
-                                              aquanconRecord.getItem("AQUIFER_ID").template get<int>(0);
+            m_aquiferID_per_record.at(aquanconRecordIdx) = aquanconRecord.getItem("AQUIFER_ID").template get<int>(0);
+            m_maxAquID = (m_maxAquID < m_aquiferID_per_record.at(aquanconRecordIdx) )?
+                            m_aquiferID_per_record.at(aquanconRecordIdx) : m_maxAquID;
             
             m_aqurecord.at(aquanconRecordIdx).influx_coeff_per_record = 
                                               aquanconRecord.getItem("INFLUX_COEFF").getSIDouble(0);
@@ -66,19 +72,48 @@ namespace Opm {
                                                                 grid.getGlobalIndex(i-1 ,j-1 ,k- 1)
                                                               );
             } // outer-most for loop for index k = [k1,k2]
-            
         }
 
-        // Logic applied here within our own private function
-        // Collate into unique aquifers
-          // Within collate
-            //TODO: find if Global index is repeated for each aquifer, if so, select only the first one
-            //TODO: Find if face on outside of reservoir or adjoins an inactive cell 
-            //TODO: Total number of grid blocks connected to aquifer must not exceed item 6 of AQUDIMS
+        // Collate_function
+        collate_function(m_aquoutput);
 
+        // Logic applied here within our own private function
+        logic_application(m_aquoutput);
 
     }                                          
-        
+    
+    void Aquancon::collate_function(std::vector<Aquancon::AquanconOutput>& output_vector)
+    {
+        output_vector.resize(m_maxAquID);
+        // Find record indices at which the aquifer ids are located in
+        for (int i = 1; i <= m_maxAquID; ++i)
+        {
+            std::vector<int> result_id (m_aquiferID_per_record.size());
+            // We only copy those equal to the aquifer id
+            auto it = std::copy_if ( m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(),
+                                        result_id.begin(), [&i](int id){ return id == i; } );
+            // Resize the result container
+            result_id.resize( std::distance(result_id.begin(), it) );
+
+            // We add the aquifer id into each element of output_vector
+            output_vector.at(i - 1).aquiferID = i;
+            for ( auto record_index_matching_id : result_id)
+            {
+                output_vector.at(i - 1).global_index.insert(
+                                                            output_vector.at(i - 1).global_index.end(),
+                                                            m_aqurecord.at(record_index_matching_id).global_index_per_record.begin(),
+                                                            m_aqurecord.at(record_index_matching_id).global_index_per_record.end()
+                                                          );
+            }
+        }
+        // Then with the container of the unique IDs, append the corresponding global indices, etc...
+    }
+
+    void Aquancon::logic_application(std::vector<Aquancon::AquanconOutput>& output_vector)
+    {
+        // Are the aquifer IDs the same for each record?
+        // m_aqurecord
+    }
 
     const std::vector<Aquancon::AquanconOutput>& Aquancon::getAquOutput() const
     {
@@ -86,3 +121,10 @@ namespace Opm {
     }
 
 }
+
+
+// Collate into unique aquifers
+          // Within collate
+            //TODO: find if Global index is repeated for each aquifer, if so, select only the first one
+            //TODO: Find if face on outside of reservoir or adjoins an inactive cell 
+            //TODO: Total number of grid blocks connected to aquifer must not exceed item 6 of AQUDIMS

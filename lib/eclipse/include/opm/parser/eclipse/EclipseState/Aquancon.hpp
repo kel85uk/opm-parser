@@ -34,6 +34,8 @@
 #include <opm/parser/eclipse/Deck/DeckKeyword.hpp>
 #include <boost/concept_check.hpp>
 
+#include <iostream>
+
 namespace Opm {
 
     class Aquancon {
@@ -43,11 +45,11 @@ namespace Opm {
                 int aquiferID;
                 std::vector<size_t> global_index;
                 std::vector<double> face_area;
-            }
+            };
 
             Aquancon(const EclipseGrid& grid, const Deck& deck);
 
-            const std::vector<Aquancon::AquanconOutput>& getAquancon() const;
+            const std::vector<Aquancon::AquanconOutput>& getAquOutput() const;
     
         private:
 
@@ -56,8 +58,7 @@ namespace Opm {
                     int i1, i2, j1, j2, k1, k2;
 
                     std::vector<size_t> global_index_per_record;
-                    // Aquifer ID
-                    int aquiferID_per_record;
+
                     // Variables constants
                     double  influx_coeff_per_record,  //Aquifer influx coefficient
                             influx_mult_per_record;   //Aquifer influx coefficient Multiplier       
@@ -68,9 +69,15 @@ namespace Opm {
 
             void logic_application(std::vector<Aquancon::AquanconOutput>& output_vector);
 
+            void collate_function(std::vector<Aquancon::AquanconOutput>& output_vector);
+
             std::vector<Aquancon::AquanconOutput> m_aquoutput;
 
             std::vector<Aquancon::AquanconRecord> m_aqurecord;
+
+            // Aquifer ID
+            std::vector<int> m_aquiferID_per_record;
+            int m_maxAquID = 0;
     };
 }
 

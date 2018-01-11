@@ -52,7 +52,8 @@ set(opmparser_SOURCES Deck/Deck.cpp
                       EclipseState/Eclipse3DProperties.cpp
                       EclipseState/EclipseConfig.cpp
                       EclipseState/EclipseState.cpp
-                      EclipseState/AquiferCT.cpp                      
+                      EclipseState/AquiferCT.cpp
+                      EclipseState/Aquancon.cpp                      
                       EclipseState/EndpointScaling.cpp
                       EclipseState/Grid/Box.cpp
                       EclipseState/Grid/BoxManager.cpp
@@ -206,6 +207,9 @@ add_executable(EclipseStateTests tests/EclipseStateTests.cpp)
 target_link_libraries(EclipseStateTests opmparser boost_test)
 add_test(NAME EclipseStateTests
          COMMAND EclipseStateTests ${_testdir}/integration_tests/)
+
+add_executable(AquanconTests tests/AquanconTests.cpp)
+target_link_libraries(AquanconTests opmparser boost_test)
 
 foreach(test ADDREGTests
              AqudimsTests
