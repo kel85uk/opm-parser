@@ -101,8 +101,8 @@ namespace Opm {
             {
                 output_vector.at(i - 1).global_index.insert(
                                                             output_vector.at(i - 1).global_index.end(),
-                                                            m_aqurecord.at(record_index_matching_id).global_index_per_record.begin(),
-                                                            m_aqurecord.at(record_index_matching_id).global_index_per_record.end()
+                                                            m_aqurecord.at(record_index_matching_id - 1).global_index_per_record.begin(),
+                                                            m_aqurecord.at(record_index_matching_id - 1).global_index_per_record.end()
                                                           );
             }
         }
