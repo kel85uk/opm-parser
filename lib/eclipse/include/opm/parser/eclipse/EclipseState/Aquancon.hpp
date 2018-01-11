@@ -26,15 +26,12 @@
   implement the Carter Tracy analytical aquifer model in OPM Flow.
 */
 
-#include <opm/parser/eclipse/EclipseState/EclipseState.hpp>
+#include <opm/parser/eclipse/EclipseState/Grid/EclipseGrid.hpp>
 #include <opm/parser/eclipse/Parser/ParserKeywords/A.hpp>
 #include <opm/parser/eclipse/Deck/Deck.hpp>
 #include <opm/parser/eclipse/Deck/DeckItem.hpp>
 #include <opm/parser/eclipse/Deck/DeckRecord.hpp>
 #include <opm/parser/eclipse/Deck/DeckKeyword.hpp>
-#include <opm/parser/eclipse/EclipseState/Tables/Aqudims.hpp>
-#include <opm/parser/eclipse/EclipseState/Tables/TableContainer.hpp>
-#include <opm/parser/eclipse/EclipseState/Tables/AqutabTable.hpp>
 #include <boost/concept_check.hpp>
 
 namespace Opm {
@@ -42,36 +39,38 @@ namespace Opm {
     class Aquancon {
         public:
 
-            struct AQUANCON_data{
+            struct AquanconOutput{
+                int aquiferID;
+                std::vector<size_t> global_index;
+                std::vector<double> face_area;
+            }
 
+            Aquancon(const EclipseGrid& grid, const Deck& deck);
+
+            const std::vector<Aquancon::AquanconOutput>& getAquancon() const;
+    
+        private:
+
+            struct AquanconRecord{
                     // Grid cell box definition to connect aquifer
                     int i1, i2, j1, j2, k1, k2;
 
-            };
-
-            struct AquiferCell{
-
-                    size_t global_index;
+                    std::vector<size_t> global_index_per_record;
                     // Aquifer ID
-                    int aquiferID;
+                    int aquiferID_per_record;
                     // Variables constants
-                    double  influx_coeff,  //Aquifer influx coefficient
-                            influx_mult;   //Aquifer influx coefficient Multiplier       
+                    double  influx_coeff_per_record,  //Aquifer influx coefficient
+                            influx_mult_per_record;   //Aquifer influx coefficient Multiplier       
                     // Cell face to connect aquifer to        
-                    std::string face;           
+                    std::string face_per_record;           
 
             };
 
-            Aquancon(const EclipseGrid grid, const Deck& deck);
+            void logic_application(std::vector<Aquancon::AquanconOutput>& output_vector);
 
-            const std::vector<Aquancon::AQUANCON_data>& getAquancon() const;
-            const std::vector<Aquancon::AquiferCell>& getConnection() const;
-    
-        private:
-  
-            std::vector<Aquancon::AQUANCON_data> m_aquancon;
-            std::vector<Aquancon::AquiferCell> m_aqucell;
+            std::vector<Aquancon::AquanconOutput> m_aquoutput;
 
+            std::vector<Aquancon::AquanconRecord> m_aqurecord;
     };
 }
 
