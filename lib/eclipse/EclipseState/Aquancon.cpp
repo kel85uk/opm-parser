@@ -120,7 +120,11 @@ namespace Opm {
 
     void Aquancon::convert_record_id_to_aquifer_id(std::vector<int>& record_indices_matching_id, int i)
     {
-        auto it = std::find_if(m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(), [&](int id){return id == i;});
+        auto it = std::find_if( m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(), 
+                                    [&](int id) {
+                                        return id == i;
+                                    } 
+                              );
         while (it != m_aquiferID_per_record.end()) {
             record_indices_matching_id.emplace_back(std::distance(m_aquiferID_per_record.begin(), it));
             it = std::find_if(std::next(it), m_aquiferID_per_record.end(), [&](int id){return id == i;});
