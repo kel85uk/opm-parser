@@ -71,6 +71,8 @@ namespace Opm {
 
             void collate_function(std::vector<Aquancon::AquanconOutput>& output_vector);
 
+            void convert_record_id_to_aquifer_id(std::vector<int>& record_indices_matching_id, int i);
+
             std::vector<Aquancon::AquanconOutput> m_aquoutput;
 
             std::vector<Aquancon::AquanconRecord> m_aqurecord;

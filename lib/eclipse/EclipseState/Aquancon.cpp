@@ -92,14 +92,7 @@ namespace Opm {
         {
             std::vector<int> result_id;
 
-            auto it = std::find_if(m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(), [&](int id){return id == i;});
-            while (it != m_aquiferID_per_record.end()) {
-                result_id.emplace_back(std::distance(m_aquiferID_per_record.begin(), it));
-                it = std::find_if(std::next(it), m_aquiferID_per_record.end(), [&](int id){return id == i;});
-            }
-            
-            // Resize the result container
-            // result_id.resize( std::distance(result_id.begin(), it) );
+            convert_record_id_to_aquifer_id(result_id, i);
 
             std::cout << "Aquifer ID = " << i << ": Result_id = " << std::endl;
             for (auto it = result_id.begin(); it != result_id.end(); ++it)
@@ -123,6 +116,18 @@ namespace Opm {
     {
         // Are the aquifer IDs the same for each record?
         // m_aqurecord
+    }
+
+    void Aquancon::convert_record_id_to_aquifer_id(std::vector<int>& record_indices_matching_id, int i)
+    {
+        auto it = std::find_if(m_aquiferID_per_record.begin(), m_aquiferID_per_record.end(), [&](int id){return id == i;});
+        while (it != m_aquiferID_per_record.end()) {
+            record_indices_matching_id.emplace_back(std::distance(m_aquiferID_per_record.begin(), it));
+            it = std::find_if(std::next(it), m_aquiferID_per_record.end(), [&](int id){return id == i;});
+        }
+        
+        // Resize the result container
+        // result_id.resize( std::distance(result_id.begin(), it) );
     }
 
     const std::vector<Aquancon::AquanconOutput>& Aquancon::getAquOutput() const
