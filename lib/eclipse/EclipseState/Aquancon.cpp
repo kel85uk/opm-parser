@@ -85,8 +85,8 @@ namespace Opm {
     void Aquancon::collate_function(std::vector<Aquancon::AquanconOutput>& output_vector)
     {
         output_vector.resize(m_maxAquID);
-        for (auto it = m_aquiferID_per_record.begin(); it != m_aquiferID_per_record.end(); ++it)
-                std::cout << *it << std::endl;
+        // for (auto it = m_aquiferID_per_record.begin(); it != m_aquiferID_per_record.end(); ++it)
+        //         std::cout << *it << std::endl;
         // Find record indices at which the aquifer ids are located in
         for (int i = 1; i <= m_maxAquID; ++i)
         {
@@ -94,9 +94,9 @@ namespace Opm {
 
             convert_record_id_to_aquifer_id(result_id, i);
 
-            std::cout << "Aquifer ID = " << i << ": Result_id = " << std::endl;
-            for (auto it = result_id.begin(); it != result_id.end(); ++it)
-                std::cout << *it << std::endl;
+            // std::cout << "Aquifer ID = " << i << ": Result_id = " << std::endl;
+            // for (auto it = result_id.begin(); it != result_id.end(); ++it)
+            //     std::cout << *it << std::endl;
 
             // We add the aquifer id into each element of output_vector
             output_vector.at(i - 1).aquiferID = i;
@@ -109,13 +109,20 @@ namespace Opm {
                                                           );
             }
         }
-        // Then with the container of the unique IDs, append the corresponding global indices, etc...
     }
 
     void Aquancon::logic_application(std::vector<Aquancon::AquanconOutput>& output_vector)
     {
-        // Are the aquifer IDs the same for each record?
-        // m_aqurecord
+        //TODO: find if Global index is repeated for each aquifer, if so, select only the first one
+        for (auto aquconvec = output_vector.begin(); aquconvec != output_vector.end(); ++aquconvec)
+        {
+            std::sort(aquconvec->global_index.begin(), aquconvec->global_index.end());
+            auto it = std::unique ( aquconvec->global_index.begin(), aquconvec->global_index.end() );
+            aquconvec->global_index.resize( std::distance(aquconvec->global_index.begin(),it) );
+        }
+
+        //TODO: Find if face on outside of reservoir or adjoins an inactive cell 
+        //TODO: Total number of grid blocks connected to aquifer must not exceed item 6 of AQUDIMS
     }
 
     void Aquancon::convert_record_id_to_aquifer_id(std::vector<int>& record_indices_matching_id, int i)
@@ -144,6 +151,4 @@ namespace Opm {
 
 // Collate into unique aquifers
           // Within collate
-            //TODO: find if Global index is repeated for each aquifer, if so, select only the first one
-            //TODO: Find if face on outside of reservoir or adjoins an inactive cell 
-            //TODO: Total number of grid blocks connected to aquifer must not exceed item 6 of AQUDIMS
+            
