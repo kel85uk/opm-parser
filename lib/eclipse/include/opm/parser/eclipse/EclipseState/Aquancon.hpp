@@ -44,7 +44,9 @@ namespace Opm {
             struct AquanconOutput{
                 int aquiferID;
                 std::vector<size_t> global_index;
-                std::vector<double> face_area;
+                std::vector<double> influx_coeff; // Size = size(global_index)
+                std::vector<double> influx_multiplier; // Size = size(global_index)
+                std::vector<std::string> reservoir_face_dir; // Size = size(global_index)
             };
 
             Aquancon(const EclipseGrid& grid, const Deck& deck);
@@ -60,10 +62,10 @@ namespace Opm {
                     std::vector<size_t> global_index_per_record;
 
                     // Variables constants
-                    double  influx_coeff_per_record,  //Aquifer influx coefficient
-                            influx_mult_per_record;   //Aquifer influx coefficient Multiplier       
+                    std::vector<double>  influx_coeff_per_record,  //Aquifer influx coefficient
+                                         influx_mult_per_record;   //Aquifer influx coefficient Multiplier       
                     // Cell face to connect aquifer to        
-                    std::string face_per_record;           
+                    std::vector<std::string> face_per_record;           
 
             };
 
