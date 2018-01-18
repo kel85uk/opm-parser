@@ -21,9 +21,9 @@
 #define OPM_AQUANCON_HPP
 
 /*
-  The Aquancon is a data container object meant to hold the data from the AQUANCON keyword.
-  This includes the logic for parsing as well as the associated tables. It is meant to be used by opm-grid and opm-simulators in order to
-  implement the Carter Tracy analytical aquifer model in OPM Flow.
+  Aquancon is a data container object meant to hold the data from the AQUANCON keyword.
+  This also includes the logic for parsing and connections to grid cells. It is meant to be used by opm-grid and opm-simulators in order to
+  implement the analytical aquifer models in OPM Flow.
 */
 
 #include <opm/parser/eclipse/EclipseState/Grid/EclipseGrid.hpp>
@@ -82,6 +82,7 @@ namespace Opm {
             // Aquifer ID
             std::vector<int> m_aquiferID_per_record;
             int m_maxAquID = 0;
+
     };
 }
 
